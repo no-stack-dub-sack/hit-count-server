@@ -17,7 +17,7 @@ const app = express(),
       production = process.env.NODE_ENV === 'production',
       PORT = production ? process.env.PORT : 5000,
       MONGO_URI = production
-        ? process.env.MONGODB_URI
+        ? process.env.MONGO_PROD_URI
         : process.env.MONGO_DEV_URI;
 
 mongoose.Promise = global.Promise;
