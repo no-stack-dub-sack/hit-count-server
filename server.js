@@ -12,18 +12,18 @@ const START_DATE = new Date(2017, 10, 18);
 
 // today's date
 const CURRENT_DATE = new Date();
-
+console.log(process.env)
 const app = express(),
       production = process.env.NODE_ENV === 'production',
       PORT = production ? process.env.PORT : 5000,
       MONGO_URI = production
-        ? process.env.MONGO_PROD_URI
+        ? process.env.MONGODB_URI
         : process.env.MONGO_DEV_URI;
 
 mongoose.Promise = global.Promise;
-mongoose.connect(MONGO_URI, {
-  useMongoClient: true,
-});
+mongoose.connect(MONGO_URI, { useMongoClient: true })
+  .then(() => console.log('Mongoose connected'))
+  .catch(err => console.error('Error connecting to MongoDB'));
 
 app.use(bodyParser.json())
 
