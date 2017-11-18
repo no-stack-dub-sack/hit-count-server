@@ -6,7 +6,7 @@ const CounterSchema = new Schema({
     type:  Number,
     default: 0,
   },
-  siteName: {
+  host: {
     type: String,
     default: ''
   }

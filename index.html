@@ -53,7 +53,7 @@
     const fetchCount = () => {
       axios.get('/get-count')
         .then(res => {
-          document.getElementById('currentSite').innerHTML = `Counting hits for: <a href="${res.data.siteName}" target="_blank" rel="noopener noreferrer">${res.data.siteName}</a>`;
+          document.getElementById('currentSite').innerHTML = `Counting hits for: <a href="${res.data.host}" target="_blank" rel="noopener noreferrer">${res.data.host}</a>`;
           document.getElementById('currentHits').innerHTML = `The current count is: ${res.data.total}`;
           document.getElementById('startedDate').innerHTML = `The count began on ${res.data.startDate}`;
           document.getElementById('currentDate').innerHTML = `Today's date is ${res.data.currentDate}`;

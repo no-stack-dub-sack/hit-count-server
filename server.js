@@ -12,7 +12,7 @@ const START_DATE = new Date(2017, 10, 18);
 
 // today's date
 const CURRENT_DATE = new Date();
-console.log(process.env)
+
 const app = express(),
       production = process.env.NODE_ENV === 'production',
       PORT = production ? process.env.PORT : 5000,
@@ -34,11 +34,10 @@ app.post('/register-count', (req, res) => {
     setDefaultsOnInsert: true
   };
   console.log('IP address yo:', req.connection.remoteAddress);
-  console.log('req body', req.body);
   Counter.findOneAndUpdate({}, {}, options, (err, doc) => {
     if (doc) {
       doc.total++;
-      doc.siteName = req.body.siteName;
+      doc.host = req.headers.host;
       doc.save(err => {
         if (err) {
           console.error('There was an error updating the hit-count-server...');
@@ -60,7 +59,7 @@ app.get('/get-count', (req, res) => {
     if (!doc) {
       res.send('No one visited yet... very depressing. (っ- ‸ – ς)');
     } else {
-      const { total, siteName } = doc;
+      const { total, host } = doc;
       let average = Math.floor(total / calculateDayRange(START_DATE, CURRENT_DATE));
       // show average on day 1 as total day 1 count
       average = average !== Infinity ? average : total;
@@ -69,7 +68,7 @@ app.get('/get-count', (req, res) => {
         startDate: prettyDate(START_DATE),
         currentDate: prettyDate(CURRENT_DATE),
         average,
-        siteName
+        host
       });
     }
   });
