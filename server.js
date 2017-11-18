@@ -33,24 +33,28 @@ app.post('/register-count', (req, res) => {
     new: true,
     setDefaultsOnInsert: true
   };
-  console.log('IP address yo:', req.connection.remoteAddress);
-  Counter.findOneAndUpdate({}, {}, options, (err, doc) => {
-    if (doc) {
-      doc.total++;
-      doc.host = req.headers.host;
-      doc.save(err => {
-        if (err) {
-          console.error('There was an error updating the hit-count-server...');
-          console.error(err);
-          res.status(500);
-        } else {
-          console.log('Count updated!');
-          res.end();
-        }
-      });
-    }
+  if (!req.connection.remoteAddress === '::ffff:10.43.224.30') {
+    Counter.findOneAndUpdate({}, {}, options, (err, doc) => {
+      if (doc) {
+        doc.total++;
+        doc.host = req.headers.referer;
+        doc.save(err => {
+          if (err) {
+            console.error('There was an error updating the hit-count-server...');
+            console.error(err);
+            res.status(500);
+          } else {
+            console.log('Count updated!');
+            res.end();
+          }
+        });
+      }
+      res.end();
+    });
+  } else {
+    console.log('not counting owner\'s visit!');
     res.end();
-  });
+  }
 });
 
 app.get('/get-count', (req, res) => {
