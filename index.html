@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Hit-Count-Server</title>
+  <style>
+    body {
+      color: white;
+      font-size: 25px;
+      font-weight: bold;
+      height: 100vh;
+      padding: 15px;
+      position: relative;
+      width: 100vw;
+      transition: background .8s;
+    }
+    #main {
+      left: 50%;
+      position: absolute;
+      top: 50%;
+      text-align: center;
+      transform: translate(-50%, -50%);
+    }
+    #header {
+      font-size: 48px;
+    }
+  </style>
+</head>
+<body>
+  <div id='main'>
+    <div id="header">
+      █▬█ █ ▀█▀
+    </div>
+    <div id="currentSite"></div>
+    <div id="currentHits"></div>
+    <div id="startedDate"></div>
+    <div id="currentDate"></div>
+    <div id="averageHits"></div>
+  </div>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.min.js'></script>
+  <script>
+    const setBackground = () => {
+      const rand = () => Math.round(Math.random() * (250));
+      const red = rand();
+      const blue = rand();
+      const green = rand();
+      document.body.style.background = `rgb(${red}, ${green}, ${blue})`;
+    }
+    (function() {
+      setBackground();
+      setInterval(() => setBackground(), 5000);
+    })();
+    const fetchCount = () => {
+      axios.get('/get-count')
+        .then(res => {
+          document.getElementById('currentSite').innerHTML = `Counting hits for: <a href="${res.data.siteName}" target="_blank" rel="noopener noreferrer">${res.data.siteName}</a>`;
+          document.getElementById('currentHits').innerHTML = `The current count is: ${res.data.total}`;
+          document.getElementById('startedDate').innerHTML = `The count began on ${res.data.startDate}`;
+          document.getElementById('currentDate').innerHTML = `Today's date is ${res.data.currentDate}`;
+          document.getElementById('averageHits').innerHTML = `Average hits per day: ${res.data.average}`;
+        })
+        .catch(err => {
+          document.getElementById('main').innerHTML = 'There was an error fetching the count...';
+        });
+    };
+    (function() {
+      fetchCount();
+      setInterval(() => fetchCount(), 60000);
+    })();
+  </script>
+</body>
+</html>
