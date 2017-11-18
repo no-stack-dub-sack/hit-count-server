@@ -33,8 +33,8 @@ app.post('/register-count', (req, res) => {
     new: true,
     setDefaultsOnInsert: true
   };
-  if (req.connection.remoteAddress !== '::ffff:10.43.224.30') {
-    console.log('ip address yo', req.connection.remoteAddress)
+  if (true) {
+    console.log(req.ip)
     Counter.findOneAndUpdate({}, {}, options, (err, doc) => {
       if (doc) {
         doc.total++;
