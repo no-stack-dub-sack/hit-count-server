@@ -34,6 +34,7 @@ app.post('/register-count', (req, res) => {
     setDefaultsOnInsert: true
   };
   console.log('IP address yo:', req.connection.remoteAddress);
+  console.log('req body', req.body);
   Counter.findOneAndUpdate({}, {}, options, (err, doc) => {
     if (doc) {
       doc.total++;
