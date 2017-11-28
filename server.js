@@ -28,12 +28,16 @@ mongoose.connect(MONGO_URI, { useMongoClient: true })
 app.use(bodyParser.json())
 
 app.post('/register-count', (req, res) => {
-  // create intial record manually at CL, rather than creating new record when querry
+  // reassign hostName if cs-playground-react is being accessed over https,
+  // needs to be the http address to find the right record in the database
+  const hostName = req.headers.referer === 'https://cs-playground-react.surge.sh/'
+    ? 'http://cs-playground-react.surge.sh/'
+    : req.headers.referer;
+  // create intial record manually at CL rather than creating new record when querry
   // does not return existing, so that new records aren't created by outside users.
   // clearly there are better auth options, but this works for my simple purpose
-  console.log(req.headers.referer)
   Counter.findOneAndUpdate(
-    { host: req.headers.referer },
+    { host: hostName },
     { $inc: { 'total' : 1 } },
     { new: true },
   (err, count) => {
@@ -64,7 +68,7 @@ app.post('/register-count', (req, res) => {
 app.get('/get-count/:id', (req, res) => {
   const hostName = req.params.id === 'cs-playground-react'
     ? 'http://cs-playground-react.surge.sh/'
-    : 'http://peterweinberg.me';
+    : 'http://peterweinberg.me/';
   Counter.findOne({ host: hostName }, (err, doc) => {
     if (err) res.send('An error occurred... T_T');
     if (!doc) {
