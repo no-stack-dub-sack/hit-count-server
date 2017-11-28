@@ -9,6 +9,20 @@ const CounterSchema = new Schema({
   host: {
     type: String,
     default: ''
+  },
+  startDate: {
+    type: Date,
+    default: Date.now
+  },
+  today: {
+    date: {
+      type: Date,
+      default: Date.now
+    },
+    count: {
+      type:  Number,
+      default: 0,
+    }
   }
 });
 

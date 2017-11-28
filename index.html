@@ -24,9 +24,20 @@
     #header {
       font-size: 48px;
     }
+    button {
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      outline: none;
+    }
   </style>
 </head>
 <body>
+  <div>
+    <button class="button" onclick="fetchCount('cs-playground-react')">cs-playground-react</button>
+    <button class="button" onclick="fetchCount('portfolio')">peterweinberg.me</button>
+  </div>
   <div id='main'>
     <div id="header">
       █▬█ █ ▀█▀
@@ -35,6 +46,7 @@
     <div id="currentHits"></div>
     <div id="startedDate"></div>
     <div id="currentDate"></div>
+    <div id="todaysCount"></div>
     <div id="averageHits"></div>
   </div>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.min.js'></script>
@@ -44,19 +56,25 @@
       const red = rand();
       const blue = rand();
       const green = rand();
-      document.body.style.background = `rgb(${red}, ${green}, ${blue})`;
+      const randColor = `rgb(${red}, ${green}, ${blue})`;
+      document.body.style.background = randColor;
+      document.getElementsByClassName('button')[0].style.color = randColor;
+      document.getElementsByClassName('button')[1].style.color = randColor;
     }
     (function() {
       setBackground();
       setInterval(() => setBackground(), 5000);
     })();
-    const fetchCount = () => {
-      axios.get('/get-count')
+    let currentHost = 'cs-playground-react';
+    const fetchCount = (host) => {
+      currentHost = host;
+      axios.get(`/get-count/${currentHost}`)
         .then(res => {
           document.getElementById('currentSite').innerHTML = `Counting hits for: <a href="${res.data.host}" target="_blank" rel="noopener noreferrer">${res.data.host}</a>`;
-          document.getElementById('currentHits').innerHTML = `The current count is: ${res.data.total}`;
+          document.getElementById('currentHits').innerHTML = `The current count is: ${res.data.totalCount}`;
           document.getElementById('startedDate').innerHTML = `The count began on ${res.data.startDate}`;
           document.getElementById('currentDate').innerHTML = `Today's date is ${res.data.currentDate}`;
+          document.getElementById('todaysCount').innerHTML = `Hits today: ${res.data.todaysCount}`;
           document.getElementById('averageHits').innerHTML = `Average hits per day: ${res.data.average}`;
         })
         .catch(err => {
@@ -64,8 +82,8 @@
         });
     };
     (function() {
-      fetchCount();
-      setInterval(() => fetchCount(), 60000);
+      fetchCount(currentHost);
+      setInterval(() => fetchCount(currentHost), 60000);
     })();
   </script>
 </body>

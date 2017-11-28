@@ -8,7 +8,7 @@ const prettyDate        = require('./prettyDate');
 dotenv.config();
 
 // date from which to begin counting hits
-const START_DATE = new Date(2017, 10, 18);
+// const START_DATE = new Date(2017, 10, 18);
 
 // today's date
 const CURRENT_DATE = new Date();
@@ -28,16 +28,25 @@ mongoose.connect(MONGO_URI, { useMongoClient: true })
 app.use(bodyParser.json())
 
 app.post('/register-count', (req, res) => {
-  const options = {
-    upsert: true,
-    new: true,
-    setDefaultsOnInsert: true
-  };
-  Counter.findOneAndUpdate({}, {}, options, (err, doc) => {
-    if (doc) {
-      doc.total++;
-      doc.host = req.headers.referer;
-      doc.save(err => {
+  // create intial record manually at CL, rather than creating new record when querry
+  // does not return existing, so that new records aren't created by outside users.
+  // clearly there are better auth options, but this works for my simple purpose
+  console.log(req.headers.referer)
+  Counter.findOneAndUpdate(
+    { host: req.headers.referer },
+    { $inc: { 'total' : 1 } },
+    { new: true },
+  (err, count) => {
+    if (count) {
+      // update today's count or reset if it's no longer today
+      if (prettyDate(count.today.date) !== prettyDate(CURRENT_DATE)) {
+        count.today.date = CURRENT_DATE,
+        count.today.count = 0;
+      } else {
+        count.today.count++;
+      }
+      // save record
+      count.save(err => {
         if (err) {
           console.error('There was an error updating the hit-count-server...');
           console.error(err);
@@ -52,22 +61,26 @@ app.post('/register-count', (req, res) => {
   });
 });
 
-app.get('/get-count', (req, res) => {
-    Counter.findOne({}, (err, doc) => {
+app.get('/get-count/:id', (req, res) => {
+  const hostName = req.params.id === 'cs-playground-react'
+    ? 'http://cs-playground-react.surge.sh/'
+    : 'http://peterweinberg.me';
+  Counter.findOne({ host: hostName }, (err, doc) => {
     if (err) res.send('An error occurred... T_T');
     if (!doc) {
       res.send('No one visited yet... very depressing. (っ- ‸ – ς)');
     } else {
-      const { total, host } = doc;
-      let average = Math.floor(total / calculateDayRange(START_DATE, CURRENT_DATE));
+      const { total, host, startDate, today: { count } } = doc;
+      let average = Math.floor(total / calculateDayRange(startDate, CURRENT_DATE));
       // show average on day 1 as total day 1 count
       average = average !== Infinity ? average : total;
       res.send({
-        total,
-        startDate: prettyDate(START_DATE),
+        totalCount: total,
+        startDate: prettyDate(startDate),
         currentDate: prettyDate(CURRENT_DATE),
+        todaysCount: count,
         average,
-        host
+        host,
       });
     }
   });
@@ -80,3 +93,5 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Sophisticated counter app listening on port ${PORT}!`);
 });
+
+// 18325
