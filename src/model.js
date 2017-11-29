@@ -12,12 +12,12 @@ const CounterSchema = new Schema({
   },
   startDate: {
     type: Date,
-    default: Date.now
+    default: new Date()
   },
   today: {
     date: {
       type: Date,
-      default: Date.now
+      default: new Date()
     },
     count: {
       type:  Number,
