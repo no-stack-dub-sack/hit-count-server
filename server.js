@@ -7,12 +7,10 @@ const mongoose          = require('mongoose');
 const prettyDate        = require('./prettyDate');
 dotenv.config();
 
-// date from which to begin counting hits
-// const START_DATE = new Date(2017, 10, 18);
-
 // today's date
 const CURRENT_DATE = new Date();
 
+// some setup stuff
 const app = express(),
       production = process.env.NODE_ENV === 'production',
       PORT = production ? process.env.PORT : 5000,
@@ -25,6 +23,7 @@ mongoose.connect(MONGO_URI, { useMongoClient: true })
   .then(() => console.log('Mongoose connected'))
   .catch(err => console.error('Error connecting to MongoDB'));
 
+// server stuff
 app.use(bodyParser.json())
 
 app.post('/register-count', (req, res) => {
@@ -45,7 +44,7 @@ app.post('/register-count', (req, res) => {
       // update today's count or reset if it's no longer today
       if (prettyDate(count.today.date) !== prettyDate(CURRENT_DATE)) {
         count.today.date = CURRENT_DATE,
-        count.today.count = 0;
+        count.today.count = 1;
       } else {
         count.today.count++;
       }
@@ -95,7 +94,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Sophisticated counter app listening on port ${PORT}!`);
+  console.log(`Hit-count-server app listening on port ${PORT}!`);
 });
-
-// 18325
