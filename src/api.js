@@ -38,7 +38,7 @@ module.exports = {
     });
   },
   getCount: (req, res) => {
-    const today = prettyDate(new Date());
+    const today = new Date();
     const host = hostName(req.params.id);
     Counter.findOne({ host }, (err, doc) => {
       if (err) res.send('An error occurred... T_T');
@@ -50,7 +50,7 @@ module.exports = {
         // if date of last recorded hit is different than today's
         // date no one has visited today, show zero hits instead
         let isZero = false;
-        if (prettyDate(lastHitDate) !== today) {
+        if (prettyDate(lastHitDate) !== prettyDate(today)) {
           isZero = true;
         }
         res.send({
