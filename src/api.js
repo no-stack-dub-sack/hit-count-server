@@ -38,22 +38,28 @@ module.exports = {
     });
   },
   getCount: (req, res) => {
-    const today = new Date();
+    const today = prettyDate(new Date());
     const host = hostName(req.params.id);
     Counter.findOne({ host }, (err, doc) => {
       if (err) res.send('An error occurred... T_T');
       if (!doc) {
         res.send('No one visited yet... very depressing. (っ- ‸ – ς)');
       } else {
-        const { total, startDate, today: { count } } = doc;
+        const { total, startDate, today: { count, date: lastHitDate } } = doc;
         const average = getAverage(startDate, today, total);
+        // if date of last recorded hit is different than today's
+        // date no one has visited today, show zero hits instead
+        let isZero = false;
+        if (prettyDate(lastHitDate) !== today) {
+          isZero = true;
+        }
         res.send({
           totalCount: total,
           startDate: prettyDate(startDate),
           currentDate: prettyDate(today),
-          todaysCount: count,
+          todaysCount: isZero ? 0 : count,
           average,
-          host,
+          host
         });
       }
     });
