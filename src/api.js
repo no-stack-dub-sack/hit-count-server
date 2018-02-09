@@ -18,7 +18,13 @@ module.exports = {
     Counter.findOneAndUpdate(filter, updater, options, (err, count) => {
       if (count) {
         if (prettyDate(count.today.date) !== prettyDate(today)) {
-          count.today.date = today,
+          // record past hits; beginning Feb. 7th, 2018
+          count.past.push({
+            date: prettyDate(count.today.date),
+            count: count.today.count
+          })
+          // reset count
+          count.today.date = today;
           count.today.count = 1;
         } else {
           count.today.count++;

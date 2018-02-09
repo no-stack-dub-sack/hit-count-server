@@ -23,7 +23,8 @@ const CounterSchema = new Schema({
       type:  Number,
       default: 0,
     }
-  }
+  },
+  past: []
 });
 
 module.exports = mongoose.model('Counter', CounterSchema);
