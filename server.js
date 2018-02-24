@@ -1,5 +1,6 @@
 const api               = require('./src/api');
 const bodyParser        = require('body-parser');
+const cors              = require('cors');
 const dotenv            = require('dotenv');
 const express           = require('express');
 const mongoose          = require('mongoose');
@@ -20,7 +21,8 @@ mongoose.connect(MONGO_URI, { useMongoClient: true })
   .catch(err => console.error('Error connecting to MongoDB'));
 
 // server stuff
-app.use(bodyParser.json())
+app.use(cors());
+app.use(bodyParser.json());
 app.post('/register-count', api.registerCount);
 app.get('/get-count/:id', api.getCount);
 app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
